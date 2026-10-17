@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px) rotate(-1deg); }
+  40%, 80% { transform: translateX(6px) rotate(1deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-12px); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes floatBalloon {
+  0% {
+    transform: translateY(115vh);
+    opacity: 0;
+  }
+  8% {
+    opacity: var(--balloon-opacity, 0.75);
+  }
+  92% {
+    opacity: var(--balloon-opacity, 0.75);
+  }
+  100% {
+    transform: translateY(-25vh);
+    opacity: 0;
+  }
+}
+
+@keyframes swayBalloon {
+  0%, 100% {
+    transform: translateX(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateX(calc(var(--sway-px, 16px) * -1)) rotate(-4deg);
+  }
+  75% {
+    transform: translateX(var(--sway-px, 16px)) rotate(4deg);
+  }
+}
+
+@keyframes popBalloon {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.4);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.balloon-float-container {
+  animation-name: floatBalloon;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.balloon-sway-container {
+  animation-name: swayBalloon;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Print Styles for QR Gift Card */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print, header, footer, button, nav {
+    display: none !important;
+  }
+}

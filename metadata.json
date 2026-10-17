@@ -1,0 +1,8 @@
+{
+  "name": "Remix Birthday Surprise Journey | Interactive QR Code Gift",
+  "description": "An interactive, personalized birthday QR code gift experience filled with magical surprises, personal letters, memory games, candles, and music.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
