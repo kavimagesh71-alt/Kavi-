@@ -20,7 +20,9 @@ import {
   Copy,
   Check,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Smartphone,
+  AlertTriangle
 } from 'lucide-react';
 
 interface Props {
@@ -28,13 +30,17 @@ interface Props {
   onNext: () => void;
   onOpenCustomizer: () => void;
   onOpenQRModal?: () => void;
+  onToggleMobileSimulator?: () => void;
+  isMobileSimulator?: boolean;
 }
 
 export const Step0QrFirstMessage: React.FC<Props> = ({ 
   config, 
   onNext, 
   onOpenCustomizer,
-  onOpenQRModal 
+  onOpenQRModal,
+  onToggleMobileSimulator,
+  isMobileSimulator,
 }) => {
   const theme = THEME_CONFIGS[config.theme] || THEME_CONFIGS.romantic;
 
@@ -53,7 +59,7 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
   const [showQrPreview, setShowQrPreview] = useState(false);
 
   const targetPasscode = (config.secretPasscode || '1234').trim().toLowerCase();
-  const shareUrl = generateShareableUrl(config);
+  const shareUrl = generateShareableUrl(config, 'clean', 'current');
 
   // Generate verified QR code for this specific gift
   useEffect(() => {
@@ -102,6 +108,13 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
 
   const handleKeypadPress = (val: string) => {
     sound.playSparkle();
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(12);
+      } catch {
+        // ignore
+      }
+    }
     if (val === 'CLEAR') {
       setEnteredPasscode('');
       setPasscodeError(false);
@@ -139,43 +152,43 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[85vh] px-3 sm:px-4 py-8 max-w-xl mx-auto w-full text-center relative z-10 animate-fadeIn">
+    <div className="flex flex-col items-center justify-center min-h-[72vh] sm:min-h-[85vh] px-2 sm:px-4 py-2 sm:py-8 max-w-xl mx-auto w-full text-center relative z-10 animate-fadeIn">
       {/* Decorative Top Badge */}
       <div 
-        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs sm:text-sm font-medium mb-5 tracking-wide shadow-sm"
+        className="inline-flex items-center gap-2 px-3.5 py-1 sm:py-1.5 rounded-full border text-xs sm:text-sm font-medium mb-3 sm:mb-5 tracking-wide shadow-sm"
         style={{
           background: 'rgba(255, 255, 255, 0.08)',
           borderColor: 'rgba(255, 255, 255, 0.2)',
         }}
       >
-        <QrCode className="w-4 h-4 text-pink-400" />
-        <span>Physical QR Code Gift Verified</span>
-        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+        <QrCode className="w-3.5 h-3.5 text-pink-400" />
+        <span>Verified Birthday Gift QR</span>
+        <Sparkles className="w-3 h-3 text-amber-300" />
       </div>
 
       {/* Main Glass Note Card */}
-      <div className={`w-full p-5 sm:p-8 rounded-3xl border shadow-2xl relative overflow-hidden ${theme.cardBg} ${theme.glow}`}>
+      <div className={`w-full p-4 sm:p-8 rounded-2xl sm:rounded-3xl border shadow-2xl relative overflow-hidden ${theme.cardBg} ${theme.glow}`}>
         {/* Glow ambient background circles */}
         <div className="absolute -top-24 -right-24 w-56 h-56 bg-pink-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-56 h-56 bg-rose-500/20 rounded-full blur-3xl pointer-events-none" />
 
         {/* Lock/Unlock Icon Header */}
-        <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-400 p-0.5 shadow-lg flex items-center justify-center">
+        <div className="w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-400 p-0.5 shadow-lg flex items-center justify-center">
           <div className="w-full h-full bg-slate-950/80 rounded-[14px] flex items-center justify-center">
             {isUnlocked ? (
-              <Unlock className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-400 animate-bounce" />
+              <Unlock className="w-7 h-7 sm:w-10 sm:h-10 text-emerald-400 animate-bounce" />
             ) : (
-              <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-pink-300 animate-pulse" />
+              <Lock className="w-7 h-7 sm:w-10 sm:h-10 text-pink-300 animate-pulse" />
             )}
           </div>
         </div>
 
         {/* Personalized Welcome Title */}
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-pink-200 via-white to-amber-200 bg-clip-text text-transparent font-serif mb-1">
+        <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-pink-200 via-white to-amber-200 bg-clip-text text-transparent font-serif mb-1">
           Happy Birthday, {config.birthdayPersonName}! ❤️
         </h1>
 
-        <p className="text-xs sm:text-sm text-slate-300 font-light mb-6">
+        <p className="text-xs sm:text-sm text-slate-300 font-light mb-4 sm:mb-6">
           {isUnlocked
             ? 'Passcode unlocked! Your surprise journey is ready.'
             : 'Enter the secret passcode to unlock your personalized birthday journey.'}
@@ -223,13 +236,13 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
             </div>
 
             {/* Quick Numeric Keypad */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'CLEAR', '0', 'BACK'].map((btn) => (
                 <button
                   key={btn}
                   type="button"
                   onClick={() => handleKeypadPress(btn)}
-                  className={`py-3 rounded-xl text-base font-bold transition-all cursor-pointer select-none active:scale-95 ${
+                  className={`h-12 sm:h-13 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-base sm:text-lg font-bold transition-all cursor-pointer select-none active:scale-95 touch-manipulation flex items-center justify-center ${
                     btn === 'CLEAR' || btn === 'BACK'
                       ? 'bg-slate-800/80 hover:bg-slate-700 text-xs text-slate-300'
                       : 'bg-white/10 hover:bg-white/20 text-white shadow-sm'
@@ -240,15 +253,30 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
               ))}
             </div>
 
-            {/* Verify Button */}
-            <button
-              type="button"
-              onClick={() => handleVerifyPasscode()}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-sm shadow-lg shadow-pink-500/30 flex items-center justify-center gap-2 transition-transform active:scale-95 cursor-pointer"
-            >
-              <Unlock className="w-4 h-4" />
-              <span>Unlock Secret Journey</span>
-            </button>
+            {/* Verify Button & Direct Open Button */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleVerifyPasscode()}
+                className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-sm shadow-lg shadow-pink-500/30 flex items-center justify-center gap-2 transition-transform active:scale-95 cursor-pointer"
+              >
+                <Unlock className="w-4 h-4" />
+                <span>Unlock Secret Journey</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsUnlocked(true);
+                  sound.playSparkle();
+                  fireHeartsConfetti();
+                }}
+                title="Open directly without passcode"
+                className="px-3.5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <span>Direct Open</span>
+              </button>
+            </div>
 
             {/* Secret Hint */}
             <div className="pt-1">
@@ -320,7 +348,7 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
               <QrCode className="w-3.5 h-3.5 text-pink-400" />
-              <span>Verified Gift QR Code</span>
+              <span>Universal Gift QR Code (For All Phones)</span>
             </span>
 
             <button
@@ -335,7 +363,7 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
           {/* QR Preview Box */}
           {showQrPreview && (
             <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-center space-y-3 animate-fadeIn">
-              <div className="w-44 h-44 mx-auto bg-white p-2.5 rounded-xl border-2 border-slate-800 shadow-md flex items-center justify-center">
+              <div className="w-48 h-48 mx-auto bg-white p-2.5 rounded-xl border-2 border-slate-800 shadow-md flex items-center justify-center">
                 {qrDataUrl ? (
                   <img src={qrDataUrl} alt="Verified Gift QR Code" className="w-full h-full object-contain" />
                 ) : (
@@ -343,7 +371,21 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
                 )}
               </div>
 
+              <div className="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 py-1.5 px-2.5 rounded-xl border border-emerald-500/30 truncate select-all">
+                {shareUrl}
+              </div>
+
               <div className="flex items-center justify-center gap-2 flex-wrap">
+                <a
+                  href={shareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Test Link</span>
+                </a>
+
                 <button
                   type="button"
                   onClick={handleCopyLink}
@@ -357,43 +399,67 @@ export const Step0QrFirstMessage: React.FC<Props> = ({
                   <button
                     type="button"
                     onClick={onOpenQRModal}
-                    className="px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                     <span>Download Printable QR Card</span>
                   </button>
                 )}
+
+                {onToggleMobileSimulator && (
+                  <button
+                    type="button"
+                    onClick={onToggleMobileSimulator}
+                    className="px-3 py-1.5 rounded-xl bg-blue-600/80 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Smartphone className="w-3.5 h-3.5 text-sky-200" />
+                    <span>{isMobileSimulator ? 'Exit Phone Mode' : '📱 Test in Mobile Frame'}</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Mobile Phone Error Helper */}
+              <div className="bg-amber-950/40 border border-amber-500/30 rounded-xl p-2.5 text-left space-y-1">
+                <div className="flex items-center gap-1.5 text-amber-300 text-[11px] font-semibold">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Cannot open on phone? (Cookie / Auth Check)</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  If your phone displays <span className="text-white font-medium">"Action required to load your app"</span>: tap <span className="text-pink-300 font-semibold">"Authenticate in new window"</span> or <span className="text-pink-300 font-semibold">"Close and continue"</span> on your phone screen. Or open in Chrome with your Google account.
+                </p>
               </div>
 
               <p className="text-[11px] text-slate-400 font-mono">
-                100% verified camera-scannable on iPhone and Android
+                ✅ Direct public link • Instant scan on iPhone, Android & Tablets
               </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Quick customizer link for the gift creator */}
+      {/* Quick links for the gift */}
       <div className="mt-5 flex items-center justify-center gap-4 text-xs text-slate-400">
-        <button
-          type="button"
-          onClick={onOpenCustomizer}
-          className="hover:text-pink-300 underline underline-offset-4 transition-colors cursor-pointer"
-        >
-          Customize Passcode & Messages
-        </button>
-
-        {onOpenQRModal && (
+        {!config.isCustomizationFrozen && (
           <>
-            <span>•</span>
             <button
               type="button"
-              onClick={onOpenQRModal}
+              onClick={onOpenCustomizer}
               className="hover:text-pink-300 underline underline-offset-4 transition-colors cursor-pointer"
             >
-              Printable QR Card Download
+              Customize Passcode & Messages
             </button>
+            {onOpenQRModal && <span>•</span>}
           </>
+        )}
+
+        {onOpenQRModal && (
+          <button
+            type="button"
+            onClick={onOpenQRModal}
+            className="hover:text-pink-300 underline underline-offset-4 transition-colors cursor-pointer"
+          >
+            Printable QR Card Download
+          </button>
         )}
       </div>
     </div>

@@ -62,14 +62,19 @@ export const Step8BirthdayCake: React.FC<Props> = ({ config, onNext, onOpenCusto
         </div>
 
         {/* 🎂 Animated Cake Illustration */}
-        <div className="relative w-64 h-60 mx-auto my-6 flex flex-col items-center justify-end">
-          {/* Candles row */}
-          <div className="flex items-end justify-center gap-6 mb-1 z-20">
+        <div className="relative w-56 h-52 sm:w-64 sm:h-60 mx-auto my-4 sm:my-6 flex flex-col items-center justify-end select-none">
+          {/* Candles row - directly tappable on mobile touchscreens */}
+          <div className="flex items-end justify-center gap-5 sm:gap-6 mb-1 z-20">
             {[0, 1, 2].map((idx) => (
-              <div key={idx} className="flex flex-col items-center relative">
+              <div 
+                key={idx} 
+                onClick={handleBlowCandles}
+                title="Tap to blow out candle"
+                className="flex flex-col items-center relative cursor-pointer active:scale-95 touch-manipulation group"
+              >
                 {/* Candle Flame / Smoke */}
                 {!candlesBlown ? (
-                  <div className="relative w-4 h-6 flex items-center justify-center mb-1">
+                  <div className="relative w-4 h-6 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
                     {/* Flame outer glow */}
                     <div className="w-4 h-6 rounded-full bg-gradient-to-t from-orange-500 via-amber-300 to-yellow-100 animate-pulse shadow-[0_0_15px_#f59e0b]" />
                     {/* Inner core */}

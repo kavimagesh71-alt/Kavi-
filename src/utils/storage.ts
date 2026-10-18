@@ -22,7 +22,11 @@ export function loadSavedConfig(): BirthdayGiftConfig {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      return { ...defaultGiftConfig, ...parsed };
+      return { 
+        ...defaultGiftConfig, 
+        ...parsed,
+        isCustomizationFrozen: parsed.isCustomizationFrozen !== undefined ? parsed.isCustomizationFrozen : true,
+      };
     }
   } catch (e) {
     console.warn('Could not read from local storage:', e);
@@ -39,13 +43,49 @@ export function saveConfigToStorage(config: BirthdayGiftConfig) {
   }
 }
 
+export const PUBLIC_CLOUD_APP_URL = 
+  (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_DEV_APP_URL || import.meta.env?.VITE_PUBLIC_APP_URL)) ||
+  'https://ais-dev-gyzkxkig36bjycsbutanva-849906799536.asia-southeast1.run.app';
+
+export const PUBLIC_SHARED_APP_URL = PUBLIC_CLOUD_APP_URL;
+export const PUBLIC_DEV_APP_URL = PUBLIC_CLOUD_APP_URL;
+
+/**
+ * Resolves the true public base URL for scannable QR codes so mobile devices worldwide can open it.
+ * Never defaults to localhost/127.0.0.1 in QR codes.
+ */
+export function resolvePublicBaseUrl(preferredSource: 'shared' | 'dev' | 'current' | string = 'current'): string {
+  if (typeof preferredSource === 'string' && (preferredSource.startsWith('http://') || preferredSource.startsWith('https://'))) {
+    return preferredSource.replace(/\/+$/, '');
+  }
+
+  if (typeof window !== 'undefined') {
+    const isLocalhost = 
+      window.location.hostname === 'localhost' || 
+      window.location.hostname === '127.0.0.1' || 
+      window.location.hostname.endsWith('.local');
+
+    // If currently accessed via a public cloud domain (not localhost), use that active domain!
+    if (!isLocalhost && window.location.origin) {
+      return window.location.origin + window.location.pathname;
+    }
+  }
+
+  // Fallback to verified Cloud Run development app URL
+  return PUBLIC_CLOUD_APP_URL;
+}
+
 /**
  * Generates a clean, reliable, camera-scannable URL for QR codes.
  * Prevents URL overflow by sanitizing heavy data URLs so any mobile camera scans it instantly.
  */
-export function generateShareableUrl(config: BirthdayGiftConfig, mode: 'full' | 'clean' = 'full'): string {
+export function generateShareableUrl(
+  config: BirthdayGiftConfig, 
+  mode: 'full' | 'clean' = 'clean',
+  preferredSource: 'shared' | 'dev' | 'current' | string = 'dev'
+): string {
   try {
-    const baseUrl = window.location.origin + window.location.pathname;
+    const baseUrl = resolvePublicBaseUrl(preferredSource);
 
     if (mode === 'clean') {
       return baseUrl;

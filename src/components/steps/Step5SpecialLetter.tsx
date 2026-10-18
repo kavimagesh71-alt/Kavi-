@@ -70,7 +70,7 @@ export const Step5SpecialLetter: React.FC<Props> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[85vh] px-3 sm:px-4 py-8 max-w-xl mx-auto w-full relative z-10 text-center animate-fadeIn">
+    <div className="flex flex-col items-center justify-center min-h-[72vh] sm:min-h-[85vh] px-2 sm:px-4 py-2 sm:py-8 max-w-xl mx-auto w-full relative z-10 text-center animate-fadeIn">
       {/* Floating background celebratory hearts & sparkles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <span className="absolute top-10 left-6 text-3xl animate-bounce opacity-70">💌</span>
@@ -79,16 +79,16 @@ export const Step5SpecialLetter: React.FC<Props> = ({
         <span className="absolute bottom-16 right-12 text-3xl animate-bounce opacity-60">🌹</span>
       </div>
 
-      <div className={`w-full p-6 sm:p-10 rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${theme.cardBg} ${theme.glow}`}>
+      <div className={`w-full p-4 sm:p-10 rounded-2xl sm:rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${theme.cardBg} ${theme.glow}`}>
         {/* Step 5 Badge */}
         <div className="mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-400/30 bg-pink-500/10 text-pink-300 text-xs sm:text-sm font-semibold mb-2">
-            <Mail className="w-4 h-4 text-pink-300" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 sm:py-1.5 rounded-full border border-pink-400/30 bg-pink-500/10 text-pink-300 text-xs sm:text-sm font-semibold mb-2">
+            <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-300" />
             <span>Step 5 of 5 • The Special Letter</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-3 h-3 text-amber-300" />
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-serif">
+          <h2 className="text-xl sm:text-4xl font-extrabold text-white font-serif">
             {isOpen ? letterTitle : 'You Received A Sealed Letter!'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">

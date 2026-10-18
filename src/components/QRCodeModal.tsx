@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { BirthdayGiftConfig } from '../types';
 import { generateShareableUrl } from '../utils/storage';
+import { PWAInstallButton } from './PWAInstallButton';
 import { 
   X, 
   Download, 
@@ -14,7 +15,12 @@ import {
   QrCode as QrIcon,
   ExternalLink,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  AlertTriangle,
+  Smartphone,
+  ChevronDown,
+  ChevronUp,
+  Info
 } from 'lucide-react';
 
 interface Props {
@@ -24,19 +30,23 @@ interface Props {
 }
 
 export const QRCodeModal: React.FC<Props> = ({ config, isOpen, onClose }) => {
-  const [urlMode, setUrlMode] = useState<'full' | 'clean'>('full');
+  const [urlMode, setUrlMode] = useState<'full' | 'clean'>('clean');
+  const [urlSource, setUrlSource] = useState<'dev' | 'custom' | 'current'>('dev');
+  const [customUrl, setCustomUrl] = useState<string>('');
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
+  const [showMobileHelp, setShowMobileHelp] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const printableCardRef = useRef<HTMLDivElement>(null);
 
-  const activeUrl = generateShareableUrl(config, urlMode);
+  const effectiveSource = urlSource === 'custom' && customUrl.trim() ? customUrl.trim() : urlSource;
+  const activeUrl = generateShareableUrl(config, urlMode, effectiveSource);
 
   useEffect(() => {
     if (isOpen) {
       generateQR(activeUrl);
     }
-  }, [isOpen, config, urlMode, activeUrl]);
+  }, [isOpen, config, urlMode, urlSource, customUrl, activeUrl]);
 
   const generateQR = async (urlToEncode: string) => {
     setIsGenerating(true);
@@ -198,29 +208,79 @@ export const QRCodeModal: React.FC<Props> = ({ config, isOpen, onClose }) => {
 
         {/* Scrollable Container */}
         <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+          {/* Target Host / Cloud URL Selector for Worldwide Mobile Scanning */}
+          <div className="bg-slate-950/90 p-2.5 rounded-2xl border border-pink-500/30 space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-slate-300">
+              <span className="font-semibold text-pink-300 flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span>Mobile Scan Destination Link:</span>
+              </span>
+              <span className="text-emerald-400 font-mono text-[10px] bg-emerald-950/70 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                100% Mobile Ready
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setUrlSource('dev')}
+                className={`py-1.5 px-2 rounded-xl text-[11px] font-semibold text-center transition-all cursor-pointer ${
+                  urlSource === 'dev'
+                    ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow ring-1 ring-pink-400/50'
+                    : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span>⚡ Live Mobile Cloud Link</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setUrlSource('custom')}
+                className={`py-1.5 px-2 rounded-xl text-[11px] font-semibold text-center transition-all cursor-pointer ${
+                  urlSource === 'custom'
+                    ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow ring-1 ring-pink-400/50'
+                    : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span>✏️ Custom Domain / IP</span>
+              </button>
+            </div>
+
+            {urlSource === 'custom' && (
+              <div className="pt-1 animate-fadeIn">
+                <input
+                  type="url"
+                  placeholder="Paste URL, e.g. https://mygift.com or http://192.168.1.10:3000"
+                  value={customUrl}
+                  onChange={(e) => setCustomUrl(e.target.value)}
+                  className="w-full text-xs font-mono bg-black/70 border border-pink-500/40 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-pink-400"
+                />
+              </div>
+            )}
+          </div>
+
           {/* QR URL Mode Selector */}
-          <div className="bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 flex gap-1">
-            <button
-              type="button"
-              onClick={() => setUrlMode('full')}
-              className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                urlMode === 'full'
-                  ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Personalized URL (With Messages)</span>
-            </button>
+          <div className="bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 flex flex-col sm:flex-row gap-1">
             <button
               type="button"
               onClick={() => setUrlMode('clean')}
-              className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 urlMode === 'clean'
-                  ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow ring-1 ring-pink-400/50'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              <span>Direct Clean URL (Ultra-Fast Scan)</span>
+              <span>⭐ Main Gift URL (Opens for Everyone)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setUrlMode('full')}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                urlMode === 'full'
+                  ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow ring-1 ring-pink-400/50'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span>🔗 Custom Encoded URL</span>
             </button>
           </div>
 
@@ -280,6 +340,54 @@ export const QRCodeModal: React.FC<Props> = ({ config, isOpen, onClose }) => {
             <div className="p-2 rounded-xl bg-black/60 font-mono text-[11px] text-slate-300 truncate select-all border border-white/5">
               {activeUrl}
             </div>
+          </div>
+
+          {/* Mobile Phone Troubleshooter & Error Guide */}
+          <div className="rounded-2xl border border-amber-500/40 bg-amber-950/30 overflow-hidden text-left">
+            <button
+              type="button"
+              onClick={() => setShowMobileHelp(!showMobileHelp)}
+              className="w-full p-3 flex items-center justify-between text-xs font-semibold text-amber-300 hover:bg-amber-500/10 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-amber-400" />
+                <span>📱 Cannot open on your phone? Tap here to fix!</span>
+              </div>
+              {showMobileHelp ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+
+            {showMobileHelp && (
+              <div className="p-3 pt-0 text-[11px] text-slate-300 space-y-2 border-t border-amber-500/20">
+                <div className="bg-black/50 p-2.5 rounded-xl border border-white/5 space-y-1.5">
+                  <p className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Seeing "Action required / Cookie check" on your phone?</span>
+                  </p>
+                  <p className="text-slate-300 leading-relaxed">
+                    This is Google AI Studio's 1-time browser security check. When that page appears on your phone:
+                  </p>
+                  <ol className="list-decimal pl-4 space-y-1 text-slate-200 font-medium">
+                    <li>Tap <strong className="text-pink-300">"Authenticate in new window"</strong> or <strong className="text-pink-300">"Close and continue"</strong> on your phone.</li>
+                    <li>If you use iPhone Safari, go to <span className="text-white">Settings &gt; Safari</span> and turn OFF <span className="text-white">"Prevent Cross-Site Tracking"</span>, or open the link directly in Chrome.</li>
+                  </ol>
+                </div>
+
+                <div className="bg-black/50 p-2.5 rounded-xl border border-white/5 space-y-1.5">
+                  <p className="font-bold text-emerald-300 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Want Anu to open it with ZERO Google login required?</span>
+                  </p>
+                  <p className="text-slate-300 leading-relaxed">
+                    Select <strong className="text-pink-300">"✏️ Custom Domain / IP"</strong> above, enter any public link (e.g. from Vercel, Netlify, or your own domain), and the QR code will instantly point to that open link!
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* PWA Mobile App Install Prompt */}
+          <div className="pt-1">
+            <PWAInstallButton variant="banner" />
           </div>
         </div>
 

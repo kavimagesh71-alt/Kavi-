@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sliders, QrCode, HelpCircle, Music, Sparkles } from 'lucide-react';
+import { Sliders, QrCode, HelpCircle, Music, Sparkles, Smartphone } from 'lucide-react';
 import { getModuleForStep } from '../types';
 
 interface Props {
@@ -10,6 +10,10 @@ interface Props {
   onOpenQR: () => void;
   onOpenGuide: () => void;
   onOpenMusicStudio: () => void;
+  isMobileSimulator?: boolean;
+  onToggleMobileSimulator?: () => void;
+  isCustomizationFrozen?: boolean;
+  onUnfreezeCustomizer?: () => void;
 }
 
 const STEP_NAMES: Record<number, string> = {
@@ -28,6 +32,10 @@ export const StepProgress: React.FC<Props> = ({
   onOpenQR,
   onOpenGuide,
   onOpenMusicStudio,
+  isMobileSimulator,
+  onToggleMobileSimulator,
+  isCustomizationFrozen,
+  onUnfreezeCustomizer,
 }) => {
   const isFrontPage = currentStep === 1;
 
@@ -60,15 +68,17 @@ export const StepProgress: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Prominent Customization Studio Button */}
-      <button
-        onClick={onOpenCustomizer}
-        title="Open Customizer to edit all 5 steps, names, letters, and theme"
-        className="px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 border border-pink-400/50 backdrop-blur-xl text-white flex items-center gap-1.5 text-xs font-bold shadow-lg shadow-pink-500/25 transition-all cursor-pointer hover:scale-105 active:scale-95"
-      >
-        <Sliders className="w-3.5 h-3.5 text-white" />
-        <span>{isFrontPage ? 'Customize Gift' : 'Customize Steps'}</span>
-      </button>
+      {/* Customization Studio Button - Only shown when NOT frozen */}
+      {!isCustomizationFrozen ? (
+        <button
+          onClick={onOpenCustomizer}
+          title="Open Customizer to edit all 5 steps, names, letters, and theme"
+          className="px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 border border-pink-400/50 backdrop-blur-xl text-white flex items-center gap-1.5 text-xs font-bold shadow-lg shadow-pink-500/25 transition-all cursor-pointer hover:scale-105 active:scale-95"
+        >
+          <Sliders className="w-3.5 h-3.5 text-white" />
+          <span>{isFrontPage ? 'Customize Gift' : 'Customize Steps'}</span>
+        </button>
+      ) : null}
 
       {/* QR Code generator trigger button */}
       <button
@@ -79,6 +89,22 @@ export const StepProgress: React.FC<Props> = ({
         <QrCode className="w-3.5 h-3.5 text-amber-300" />
         <span className="hidden sm:inline">QR Code</span>
       </button>
+
+      {/* Mobile Simulator Toggle Button */}
+      {onToggleMobileSimulator && (
+        <button
+          onClick={onToggleMobileSimulator}
+          title={isMobileSimulator ? 'Switch back to Full Screen' : 'Test on Phone View (Mobile Simulator)'}
+          className={`px-2.5 sm:px-3 py-1.5 rounded-full border backdrop-blur-xl flex items-center gap-1.5 text-xs font-semibold shadow-md transition-all cursor-pointer ${
+            isMobileSimulator
+              ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30'
+              : 'bg-black/50 hover:bg-white/10 border-white/15 text-slate-200 hover:text-white'
+          }`}
+        >
+          <Smartphone className={`w-3.5 h-3.5 ${isMobileSimulator ? 'text-white' : 'text-sky-300'}`} />
+          <span className="hidden sm:inline">{isMobileSimulator ? 'Full Screen' : 'Phone View'}</span>
+        </button>
+      )}
 
       {/* AI Music Studio Button */}
       <button

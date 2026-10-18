@@ -7,6 +7,7 @@ export const defaultGiftConfig: BirthdayGiftConfig = {
   birthdayDate: 'October 24',
   theme: 'romantic',
   enableFloatingBalloons: true,
+  isCustomizationFrozen: true,
   
   firstMessage: `Happy Birthday, Anu! ❤️
 

@@ -12,16 +12,26 @@ class SoundEngine {
   private isMuted = false;
 
   private initContext() {
-    if (!this.ctx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtxClass();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.value = 0.35;
-      this.masterGain.connect(this.ctx.destination);
+    try {
+      if (!this.ctx) {
+        const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (AudioCtxClass) {
+          this.ctx = new AudioCtxClass();
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.value = 0.35;
+          this.masterGain.connect(this.ctx.destination);
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+    } catch (e) {
+      console.warn('AudioContext not allowed or ready yet:', e);
     }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+  }
+
+  public unlockAudioOnMobile() {
+    this.initContext();
   }
 
   public setMuted(muted: boolean) {
@@ -32,6 +42,10 @@ class SoundEngine {
     if (this.customAudio) {
       this.customAudio.muted = muted;
     }
+  }
+
+  public getIsMuted(): boolean {
+    return this.isMuted;
   }
 
   public getIsPlaying(): boolean {

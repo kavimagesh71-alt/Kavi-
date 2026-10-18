@@ -51,31 +51,31 @@ export const Step2BirthdayReveal: React.FC<Props> = ({ config, onNext, onOpenCus
         <span className="absolute right-[28%] -bottom-8 text-5xl animate-[bounce_4.5s_infinite_0.2s] opacity-60">🎈</span>
       </div>
 
-      <div className={`w-full p-8 sm:p-12 rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${theme.cardBg} ${theme.glow}`}>
+      <div className={`w-full p-5 sm:p-12 rounded-2xl sm:rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${theme.cardBg} ${theme.glow}`}>
         {/* Celebration header badge */}
-        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-amber-400/40 bg-amber-500/20 text-amber-200 text-sm font-bold tracking-widest uppercase mb-6 shadow-md animate-pulse">
-          <Sparkles className="w-4 h-4 text-amber-300" />
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full border border-amber-400/40 bg-amber-500/20 text-amber-200 text-xs sm:text-sm font-bold tracking-widest uppercase mb-4 sm:mb-6 shadow-md animate-pulse">
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />
           <span>CELEBRATING YOUR SPECIAL DAY</span>
-          <Sparkles className="w-4 h-4 text-amber-300" />
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />
         </div>
 
         {/* Big Reveal Heading */}
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4">
+        <h1 className="text-2xl sm:text-5xl font-black tracking-tight mb-3 sm:mb-4">
           <span className="bg-gradient-to-r from-amber-300 via-pink-400 to-rose-400 bg-clip-text text-transparent block">
             🎉 {revealHeading} 🎉
           </span>
-          <span className="text-3xl sm:text-5xl font-serif text-white block mt-3 font-normal drop-shadow-md">
+          <span className="text-2xl sm:text-5xl font-serif text-white block mt-2 sm:mt-3 font-normal drop-shadow-md">
             {config.birthdayPersonName} <span className="text-rose-500 inline-block animate-pulse">❤️</span>
           </span>
         </h1>
 
-        <p className="text-lg sm:text-2xl text-pink-200 font-medium tracking-wide mt-4 mb-6">
+        <p className="text-base sm:text-2xl text-pink-200 font-medium tracking-wide mt-2 sm:mt-4 mb-4 sm:mb-6">
           {revealTagline}
         </p>
 
         {/* Typing message container */}
-        <div className="min-h-[70px] bg-black/25 rounded-2xl p-4 sm:p-6 border border-white/10 mb-8 flex items-center justify-center">
-          <p className="text-slate-200 text-base sm:text-xl font-light italic leading-relaxed">
+        <div className="min-h-[60px] sm:min-h-[70px] bg-black/25 rounded-2xl p-3.5 sm:p-6 border border-white/10 mb-6 sm:mb-8 flex items-center justify-center">
+          <p className="text-slate-200 text-sm sm:text-xl font-light italic leading-relaxed">
             {typedText}
             <span className="inline-block w-1.5 h-5 bg-pink-400 ml-1 animate-pulse align-middle" />
           </p>

@@ -49,6 +49,7 @@ export interface BirthdayGiftConfig {
   birthdayDate: string;
   theme: ThemeType;
   enableFloatingBalloons?: boolean;
+  isCustomizationFrozen?: boolean;
   
   // Step 0 & 1 - First QR Screen & Passcode Photo Lock
   firstMessage: string;

@@ -53,9 +53,9 @@ export const Step3PersonalMessage: React.FC<Props> = ({ config, onNext, onOpenCu
       </div>
 
       {/* Parchment / Letter Styled Card */}
-      <div className={`w-full p-7 sm:p-10 rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${theme.cardBg} ${theme.glow}`}>
+      <div className={`w-full p-4 sm:p-10 rounded-2xl sm:rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${theme.cardBg} ${theme.glow}`}>
         {/* Wax Seal / Stamp Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+        <div className="flex items-center justify-between border-b border-white/10 pb-3 sm:pb-4 mb-4 sm:mb-6">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-rose-600/30 border border-rose-500/50 flex items-center justify-center text-rose-400">
               💌
@@ -73,7 +73,7 @@ export const Step3PersonalMessage: React.FC<Props> = ({ config, onNext, onOpenCu
         {/* Letter content with typewriter effect */}
         <div 
           onClick={handleSkipTyping}
-          className="bg-black/30 rounded-2xl p-6 sm:p-8 border border-white/10 mb-8 min-h-[220px] cursor-pointer relative group"
+          className="bg-black/30 rounded-2xl p-4 sm:p-8 border border-white/10 mb-6 sm:mb-8 min-h-[170px] sm:min-h-[220px] cursor-pointer relative group"
           title="Click to reveal all text instantly"
         >
           <div className="text-slate-100 text-base sm:text-lg leading-relaxed whitespace-pre-line font-serif italic selection:bg-rose-500 selection:text-white">

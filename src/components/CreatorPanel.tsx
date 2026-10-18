@@ -10,6 +10,8 @@ import {
   Music, 
   Palette, 
   Lock,
+  Unlock,
+  ShieldCheck,
   Mail,
   PartyPopper,
   Flame,
@@ -177,6 +179,24 @@ export const CreatorPanel: React.FC<Props> = ({
     setTimeout(() => setSaveToast(false), 2000);
   };
 
+  const [mainToast, setMainToast] = useState(false);
+  const [freezeToast, setFreezeToast] = useState<'frozen' | 'unfrozen' | null>(null);
+
+  const handleSetAsMain = () => {
+    onSave(formData);
+    setMainToast(true);
+    setTimeout(() => setMainToast(false), 3000);
+  };
+
+  const handleToggleFreeze = () => {
+    const nextFrozen = formData.isCustomizationFrozen !== true;
+    const updated = { ...formData, isCustomizationFrozen: nextFrozen };
+    setFormData(updated);
+    onSave(updated);
+    setFreezeToast(nextFrozen ? 'frozen' : 'unfrozen');
+    setTimeout(() => setFreezeToast(null), 3500);
+  };
+
   const handleReset = () => {
     if (window.confirm('Reset all 5 steps back to default template?')) {
       const reset = resetToDefaults();
@@ -195,9 +215,22 @@ export const CreatorPanel: React.FC<Props> = ({
               <Sparkles className="w-5 h-5 text-pink-400" />
             </div>
             <div>
-              <h3 className="text-lg sm:text-xl font-bold font-serif text-white">
-                Customize All 5 Steps
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg sm:text-xl font-bold font-serif text-white">
+                  Customize All 5 Steps
+                </h3>
+                {formData.isCustomizationFrozen ? (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-amber-400" />
+                    <span>FROZEN FOR ANU</span>
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 flex items-center gap-1">
+                    <Unlock className="w-3 h-3 text-emerald-400" />
+                    <span>EDITING MODE</span>
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-slate-400">
                 Personalize every detail across Step 1 to Step 5
               </p>
@@ -1172,22 +1205,55 @@ export const CreatorPanel: React.FC<Props> = ({
             <span>Reset Defaults</span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <button
+              type="button"
+              onClick={handleToggleFreeze}
+              title={formData.isCustomizationFrozen ? "Unfreeze to re-enable customization buttons" : "Freeze customization so editing buttons are hidden from Anu"}
+              className={`px-3 sm:px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all cursor-pointer active:scale-95 ${
+                formData.isCustomizationFrozen
+                  ? 'bg-amber-600 hover:bg-amber-500 text-white ring-1 ring-amber-400'
+                  : 'bg-emerald-700 hover:bg-emerald-600 text-white'
+              }`}
+            >
+              {formData.isCustomizationFrozen ? (
+                <>
+                  <Unlock className="w-3.5 h-3.5" />
+                  <span>Unfreeze Customize</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Freeze Customization</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSetAsMain}
+              title="Sets this configuration as the primary experience for anyone opening the app or scanning the QR code"
+              className="px-3 sm:px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer active:scale-95"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
+              <span>Set As Main For All</span>
+            </button>
+
             <button
               type="button"
               onClick={() => {
                 handleSave();
                 onOpenQR();
               }}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 transition-colors cursor-pointer"
+              className="px-3 sm:px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <span>Generate QR</span>
+              <span>QR Code</span>
             </button>
 
             <button
               type="button"
               onClick={handleSave}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg transition-transform active:scale-95 cursor-pointer"
+              className="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg transition-transform active:scale-95 cursor-pointer"
             >
               <Save className="w-4 h-4" />
               <span>Save & Preview</span>
@@ -1195,10 +1261,28 @@ export const CreatorPanel: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Toast */}
+        {/* Toasts */}
         {saveToast && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xl animate-bounce">
             Settings Saved & Applied Successfully! ❤️
+          </div>
+        )}
+
+        {mainToast && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-600 to-rose-600 text-white px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold shadow-2xl animate-bounce border border-amber-300/40 text-center z-50">
+            ⭐ Set as Main Gift for All! QR Code & Universal Link Updated ❤️
+          </div>
+        )}
+
+        {freezeToast === 'frozen' && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-600 to-rose-600 text-white px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold shadow-2xl animate-bounce border border-amber-300/40 text-center z-50">
+            🔒 Customization Frozen! Editing buttons are now hidden for Anu ❤️
+          </div>
+        )}
+
+        {freezeToast === 'unfrozen' && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold shadow-2xl animate-bounce text-center z-50">
+            🔓 Customization Unfrozen! Editing controls are enabled.
           </div>
         )}
       </div>
